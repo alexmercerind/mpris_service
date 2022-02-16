@@ -10,177 +10,241 @@ class Player_Interface extends DBusObject {
   final MPRISServiceState state;
 
   /// Creates a new object to expose on [path].
-  Player_Interface(this.state,
-      {DBusObjectPath path =
-          const DBusObjectPath.unchecked('/Player_Interface')})
-      : super(path);
+  Player_Interface(
+    this.state, {
+    DBusObjectPath path = const DBusObjectPath.unchecked('/Player_Interface'),
+  }) : super(path);
 
   /// Gets value of property org.mpris.MediaPlayer2.Player.PlaybackStatus
   Future<DBusMethodResponse> getPlaybackStatus() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Player.PlaybackStatus not implemented');
+    return DBusMethodSuccessResponse([
+      DBusString(
+        state.isCompleted
+            ? 'Stopped'
+            : state.isPlaying
+                ? 'Playing'
+                : 'Paused',
+      ),
+    ]);
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.Player.LoopStatus
   Future<DBusMethodResponse> getLoopStatus() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Player.LoopStatus not implemented');
+    return DBusMethodSuccessResponse([DBusString(state.loopStatus)]);
   }
 
   /// Sets property org.mpris.MediaPlayer2.Player.LoopStatus
   Future<DBusMethodResponse> setLoopStatus(String value) async {
-    return DBusMethodErrorResponse.failed(
-        'Set org.mpris.MediaPlayer2.Player.LoopStatus not implemented');
+    state.setLoopStatus?.call(value);
+    return DBusMethodSuccessResponse();
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.Player.Rate
   Future<DBusMethodResponse> getRate() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Player.Rate not implemented');
+    return DBusMethodSuccessResponse([DBusDouble(state.rate)]);
   }
 
   /// Sets property org.mpris.MediaPlayer2.Player.Rate
   Future<DBusMethodResponse> setRate(double value) async {
-    return DBusMethodErrorResponse.failed(
-        'Set org.mpris.MediaPlayer2.Player.Rate not implemented');
+    state.setRate?.call(value);
+    return DBusMethodSuccessResponse();
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.Player.Shuffle
   Future<DBusMethodResponse> getShuffle() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Player.Shuffle not implemented');
+    return DBusMethodSuccessResponse([DBusBoolean(state.isShuffling)]);
   }
 
   /// Sets property org.mpris.MediaPlayer2.Player.Shuffle
   Future<DBusMethodResponse> setShuffle(bool value) async {
-    return DBusMethodErrorResponse.failed(
-        'Set org.mpris.MediaPlayer2.Player.Shuffle not implemented');
+    state.setShuffle?.call(value);
+    return DBusMethodSuccessResponse();
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.Player.Metadata
   Future<DBusMethodResponse> getMetadata() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Player.Metadata not implemented');
+    /// https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata
+    if (state.playlist.isEmpty) {
+      return DBusMethodSuccessResponse(
+        [DBusDict(DBusSignature('s'), DBusSignature('v'), {})],
+      );
+    }
+    final i = state.index.clamp(0, state.playlist.length - 1);
+    final track = state.playlist[i];
+    return DBusMethodSuccessResponse([
+      DBusDict(
+        DBusSignature('s'),
+        DBusSignature('v'),
+        {
+          DBusString('mpris:trackid'): DBusVariant(
+            DBusObjectPath(track.hashCode.toString()),
+          ),
+          DBusString('mpris:length'): DBusVariant(
+            DBusInt64(track.duration?.inMicroseconds ?? 0),
+          ),
+          DBusString('mpris:artUrl'): DBusVariant(
+            DBusString(track.artworkUri),
+          ),
+          DBusString('xesam:album'): DBusVariant(
+            DBusString(track.albumName),
+          ),
+          DBusString('xesam:albumArtist'): DBusVariant(
+            DBusArray(DBusSignature('s'), [
+              DBusString(track.albumArtistName),
+            ]),
+          ),
+          DBusString('xesam:artist'): DBusVariant(
+            DBusArray(
+              DBusSignature('s'),
+              track.trackArtistNames.map((e) => DBusString(e)),
+            ),
+          ),
+          if (track.year != 'Unknown Year')
+            DBusString('xesam:contentCreated'): DBusVariant(
+              DBusString('${track.year}-01-01T00:00:00.000'),
+            ),
+          DBusString('xesam:discNumber'): DBusVariant(
+            DBusInt32(1),
+          ),
+          DBusString('xesam:firstUsed'): DBusVariant(
+            DBusString(track.timeAdded.toIso8601String()),
+          ),
+          DBusString('xesam:title'): DBusVariant(
+            DBusString(track.trackName),
+          ),
+          DBusString('xesam:trackNumber'): DBusVariant(
+            DBusInt32(track.trackNumber),
+          ),
+          DBusString('xesam:url'): DBusVariant(
+            DBusString(track.uri.toString()),
+          ),
+        },
+      )
+    ]);
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.Player.Volume
   Future<DBusMethodResponse> getVolume() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Player.Volume not implemented');
+    return DBusMethodSuccessResponse([DBusDouble(state.volume / 100)]);
   }
 
   /// Sets property org.mpris.MediaPlayer2.Player.Volume
   Future<DBusMethodResponse> setVolume(double value) async {
-    return DBusMethodErrorResponse.failed(
-        'Set org.mpris.MediaPlayer2.Player.Volume not implemented');
+    state.setVolume?.call(value * 100);
+    return DBusMethodSuccessResponse();
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.Player.Position
   Future<DBusMethodResponse> getPosition() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Player.Position not implemented');
+    return DBusMethodSuccessResponse(
+      [DBusInt64(state.position.inMicroseconds)],
+    );
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.Player.MinimumRate
   Future<DBusMethodResponse> getMinimumRate() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Player.MinimumRate not implemented');
+    return DBusMethodSuccessResponse([DBusDouble(0.5)]);
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.Player.MaximumRate
   Future<DBusMethodResponse> getMaximumRate() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Player.MaximumRate not implemented');
+    return DBusMethodSuccessResponse([DBusDouble(2.0)]);
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.Player.CanGoNext
   Future<DBusMethodResponse> getCanGoNext() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Player.CanGoNext not implemented');
+    return DBusMethodSuccessResponse(
+      [DBusBoolean(state.index < state.playlist.length - 1)],
+    );
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.Player.CanGoPrevious
   Future<DBusMethodResponse> getCanGoPrevious() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Player.CanGoPrevious not implemented');
+    return DBusMethodSuccessResponse(
+      [DBusBoolean(state.index > 0)],
+    );
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.Player.CanPlay
   Future<DBusMethodResponse> getCanPlay() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Player.CanPlay not implemented');
+    return DBusMethodSuccessResponse(
+      [DBusBoolean(true)],
+    );
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.Player.CanPause
   Future<DBusMethodResponse> getCanPause() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Player.CanPause not implemented');
+    return DBusMethodSuccessResponse(
+      [DBusBoolean(true)],
+    );
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.Player.CanSeek
   Future<DBusMethodResponse> getCanSeek() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Player.CanSeek not implemented');
+    return DBusMethodSuccessResponse(
+      [DBusBoolean(true)],
+    );
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.Player.CanControl
   Future<DBusMethodResponse> getCanControl() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Player.CanControl not implemented');
+    return DBusMethodSuccessResponse(
+      [DBusBoolean(true)],
+    );
   }
 
   /// Implementation of org.mpris.MediaPlayer2.Player.Next()
   Future<DBusMethodResponse> doNext() async {
-    return DBusMethodErrorResponse.failed(
-        'org.mpris.MediaPlayer2.Player.Next() not implemented');
+    state.doNext?.call();
+    return DBusMethodSuccessResponse();
   }
 
   /// Implementation of org.mpris.MediaPlayer2.Player.Previous()
   Future<DBusMethodResponse> doPrevious() async {
-    return DBusMethodErrorResponse.failed(
-        'org.mpris.MediaPlayer2.Player.Previous() not implemented');
+    state.doPrevious?.call();
+    return DBusMethodSuccessResponse();
   }
 
   /// Implementation of org.mpris.MediaPlayer2.Player.Pause()
   Future<DBusMethodResponse> doPause() async {
-    return DBusMethodErrorResponse.failed(
-        'org.mpris.MediaPlayer2.Player.Pause() not implemented');
+    state.doPause?.call();
+    return DBusMethodSuccessResponse();
   }
 
   /// Implementation of org.mpris.MediaPlayer2.Player.PlayPause()
   Future<DBusMethodResponse> doPlayPause() async {
-    return DBusMethodErrorResponse.failed(
-        'org.mpris.MediaPlayer2.Player.PlayPause() not implemented');
+    state.doPlayPause?.call();
+    return DBusMethodSuccessResponse();
   }
 
   /// Implementation of org.mpris.MediaPlayer2.Player.Stop()
   Future<DBusMethodResponse> doStop() async {
-    return DBusMethodErrorResponse.failed(
-        'org.mpris.MediaPlayer2.Player.Stop() not implemented');
+    state.doStop?.call();
+    return DBusMethodSuccessResponse();
   }
 
   /// Implementation of org.mpris.MediaPlayer2.Player.Play()
   Future<DBusMethodResponse> doPlay() async {
-    return DBusMethodErrorResponse.failed(
-        'org.mpris.MediaPlayer2.Player.Play() not implemented');
+    state.doPlay?.call();
+    return DBusMethodSuccessResponse();
   }
 
   /// Implementation of org.mpris.MediaPlayer2.Player.Seek()
   Future<DBusMethodResponse> doSeek(int Offset) async {
-    return DBusMethodErrorResponse.failed(
-        'org.mpris.MediaPlayer2.Player.Seek() not implemented');
+    state.doSeek?.call(Offset);
+    return DBusMethodSuccessResponse();
   }
 
   /// Implementation of org.mpris.MediaPlayer2.Player.SetPosition()
   Future<DBusMethodResponse> doSetPosition(String TrackId, int Position) async {
-    return DBusMethodErrorResponse.failed(
-        'org.mpris.MediaPlayer2.Player.SetPosition() not implemented');
+    state.doSetPosition?.call(TrackId, Position);
+    return DBusMethodSuccessResponse();
   }
 
   /// Implementation of org.mpris.MediaPlayer2.Player.OpenUri()
-  Future<DBusMethodResponse> doOpenUri(String Uri) async {
-    return DBusMethodErrorResponse.failed(
-        'org.mpris.MediaPlayer2.Player.OpenUri() not implemented');
+  Future<DBusMethodResponse> doOpenUri(String uri) async {
+    state.doOpenUri?.call(Uri.parse(uri));
+    return DBusMethodSuccessResponse();
   }
 
   /// Emits signal org.mpris.MediaPlayer2.Player.Seeked
