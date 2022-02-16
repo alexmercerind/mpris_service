@@ -17,7 +17,64 @@ import 'package:mpris_service/generated/player.dart';
 ///
 /// This class can be used to expose a media player functionalities to The Media Player Remote Interfacing Specification (MPRIS) in standard D-Bus interface.
 ///
-class MPRISService {
+class MPRISService extends MPRISServiceState {
+  MPRISService({
+    required String busName,
+    required String identity,
+    required String desktopEntry,
+    required List<String> supportedUriSchemes,
+    required List<String> supportedMimeTypes,
+    required void Function(bool) setFullscreen,
+    required void Function() doRaise,
+    required void Function() doQuit,
+  }) : super(
+          busName,
+          identity,
+          desktopEntry,
+          supportedUriSchemes,
+          supportedMimeTypes,
+          setFullscreen,
+          doRaise,
+          doQuit,
+        ) {
+    if (Platform.isLinux) {
+      _player = Media_Player(
+        this,
+        path: DBusObjectPath('/org/mpris/MediaPlayer2'),
+      );
+      _interface = Player_Interface(
+        this,
+        path: DBusObjectPath('/org/mpris/MediaPlayer2'),
+      );
+      _client = DBusClient.session()..requestName(busName);
+      _client.registerObject(_player);
+      _client.registerObject(_interface);
+    }
+  }
+
+  late DBusClient _client;
+  late Media_Player _player;
+  late Player_Interface _interface;
+}
+
+/// MPRISServiceState
+/// -----------------
+///
+/// An object used to keep the present `org.mpris.MediaPlayer2` state.
+/// More fields & attributes can be added in future.
+///
+class MPRISServiceState {
+  MPRISServiceState(
+    this.busName,
+    this.identity,
+    this.desktopEntry,
+    this.supportedUriSchemes,
+    this.supportedMimeTypes,
+    this.setFullscreen,
+    this.doRaise,
+    this.doQuit,
+  );
+
   /// Each media player must request a unique bus name which begins with org.mpris.MediaPlayer2. For example:
 
   /// * `org.mpris.MediaPlayer2.harmonoid`
@@ -39,40 +96,27 @@ class MPRISService {
   /// Mime-types should be in the standard format (eg: audio/mpeg or application/ogg).
   final List<String> supportedMimeTypes;
 
-  MPRISService({
-    required this.busName,
-    required this.identity,
-    required this.desktopEntry,
-    required this.supportedUriSchemes,
-    required this.supportedMimeTypes,
-  }) {
-    if (Platform.isLinux) {
-      _player = Media_Player(
-        _state,
-        path: DBusObjectPath('/org/mpris/MediaPlayer2'),
-      );
-      _interface = Player_Interface(
-        _state,
-        path: DBusObjectPath('/org/mpris/MediaPlayer2'),
-      );
-      _client = DBusClient.session()..requestName(busName);
-      _client.registerObject(_player);
-      _client.registerObject(_interface);
-    }
-  }
+  final void Function(bool)? setFullscreen;
 
-  final MPRISServiceState _state = MPRISServiceState();
-  late DBusClient _client;
-  late Media_Player _player;
-  late Player_Interface _interface;
-}
+  final void Function()? doRaise;
 
-/// MPRISServiceState
-/// -----------------
-///
-/// An object used to keep the present `org.mpris.MediaPlayer2` state.
-/// More fields & attributes can be added in future.
-class MPRISServiceState {
+  final void Function()? doQuit;
+
+  /// Whether the media player can be quit.
+  bool canQuit = true;
+
+  /// Whether the media player is fullscreen.
+  bool fullscreen = false;
+
+  /// Whether the media player can be made fullscreen.
+  bool canSetFullscreen = true;
+
+  /// Whether the media player can be raised.
+  bool canRaise = false;
+
+  /// Whether the media player has a track list.
+  bool get hasTrackList => playlist.isNotEmpty;
+
   int index = 0;
   List<MPRISMedia> playlist = [];
   double volume = 50.0;
@@ -89,6 +133,7 @@ class MPRISServiceState {
 
 /// MPRISMedia
 /// ----------
+///
 /// An object used to represent a media & retrieve/expose `org.mpris.MediaPlayer2.Player.Metadata`.
 ///
 class MPRISMedia {

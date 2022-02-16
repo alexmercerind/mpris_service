@@ -409,22 +409,22 @@ class Player_Interface extends DBusObject {
   Future<DBusMethodResponse> getAllProperties(String interface) async {
     var properties = <String, DBusValue>{};
     if (interface == 'org.mpris.MediaPlayer2.Player') {
-      // properties['PlaybackStatus'] =
-      //     (await getPlaybackStatus()).returnValues[0];
-      // properties['LoopStatus'] = (await getLoopStatus()).returnValues[0];
-      // properties['Rate'] = (await getRate()).returnValues[0];
-      // properties['Shuffle'] = (await getShuffle()).returnValues[0];
-      // properties['Metadata'] = (await getMetadata()).returnValues[0];
-      // properties['Volume'] = (await getVolume()).returnValues[0];
-      // properties['Position'] = (await getPosition()).returnValues[0];
-      // properties['MinimumRate'] = (await getMinimumRate()).returnValues[0];
-      // properties['MaximumRate'] = (await getMaximumRate()).returnValues[0];
-      // properties['CanGoNext'] = (await getCanGoNext()).returnValues[0];
-      // properties['CanGoPrevious'] = (await getCanGoPrevious()).returnValues[0];
-      // properties['CanPlay'] = (await getCanPlay()).returnValues[0];
-      // properties['CanPause'] = (await getCanPause()).returnValues[0];
-      // properties['CanSeek'] = (await getCanSeek()).returnValues[0];
-      // properties['CanControl'] = (await getCanControl()).returnValues[0];
+      properties['PlaybackStatus'] =
+          (await getPlaybackStatus()).returnValues[0];
+      properties['LoopStatus'] = (await getLoopStatus()).returnValues[0];
+      properties['Rate'] = (await getRate()).returnValues[0];
+      properties['Shuffle'] = (await getShuffle()).returnValues[0];
+      properties['Metadata'] = (await getMetadata()).returnValues[0];
+      properties['Volume'] = (await getVolume()).returnValues[0];
+      properties['Position'] = (await getPosition()).returnValues[0];
+      properties['MinimumRate'] = (await getMinimumRate()).returnValues[0];
+      properties['MaximumRate'] = (await getMaximumRate()).returnValues[0];
+      properties['CanGoNext'] = (await getCanGoNext()).returnValues[0];
+      properties['CanGoPrevious'] = (await getCanGoPrevious()).returnValues[0];
+      properties['CanPlay'] = (await getCanPlay()).returnValues[0];
+      properties['CanPause'] = (await getCanPause()).returnValues[0];
+      properties['CanSeek'] = (await getCanSeek()).returnValues[0];
+      properties['CanControl'] = (await getCanControl()).returnValues[0];
     }
     return DBusMethodSuccessResponse([DBusDict.stringVariant(properties)]);
   }

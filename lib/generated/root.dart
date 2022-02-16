@@ -16,74 +16,79 @@ class Media_Player extends DBusObject {
 
   /// Gets value of property org.mpris.MediaPlayer2.CanQuit
   Future<DBusMethodResponse> getCanQuit() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.CanQuit not implemented');
+    return DBusMethodSuccessResponse([DBusBoolean(state.canQuit)]);
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.Fullscreen
   Future<DBusMethodResponse> getFullscreen() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Fullscreen not implemented');
+    return DBusMethodSuccessResponse([DBusBoolean(state.fullscreen)]);
   }
 
   /// Sets property org.mpris.MediaPlayer2.Fullscreen
   Future<DBusMethodResponse> setFullscreen(bool value) async {
-    return DBusMethodErrorResponse.failed(
-        'Set org.mpris.MediaPlayer2.Fullscreen not implemented');
+    state.setFullscreen?.call(value);
+    return DBusMethodSuccessResponse();
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.CanSetFullscreen
   Future<DBusMethodResponse> getCanSetFullscreen() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.CanSetFullscreen not implemented');
+    return DBusMethodSuccessResponse([DBusBoolean(state.canSetFullscreen)]);
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.CanRaise
   Future<DBusMethodResponse> getCanRaise() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.CanRaise not implemented');
+    return DBusMethodSuccessResponse([DBusBoolean(state.canRaise)]);
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.HasTrackList
   Future<DBusMethodResponse> getHasTrackList() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.HasTrackList not implemented');
+    return DBusMethodSuccessResponse([DBusBoolean(state.hasTrackList)]);
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.Identity
   Future<DBusMethodResponse> getIdentity() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.Identity not implemented');
+    return DBusMethodSuccessResponse([DBusString(state.identity)]);
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.DesktopEntry
   Future<DBusMethodResponse> getDesktopEntry() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.DesktopEntry not implemented');
+    return DBusMethodSuccessResponse([DBusString(state.desktopEntry)]);
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.SupportedUriSchemes
   Future<DBusMethodResponse> getSupportedUriSchemes() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.SupportedUriSchemes not implemented');
+    return DBusMethodSuccessResponse(
+      [
+        DBusArray(
+          DBusSignature('s'),
+          state.supportedUriSchemes.map((e) => DBusString(e)),
+        )
+      ],
+    );
   }
 
   /// Gets value of property org.mpris.MediaPlayer2.SupportedMimeTypes
   Future<DBusMethodResponse> getSupportedMimeTypes() async {
-    return DBusMethodErrorResponse.failed(
-        'Get org.mpris.MediaPlayer2.SupportedMimeTypes not implemented');
+    return DBusMethodSuccessResponse(
+      [
+        DBusArray(
+          DBusSignature('s'),
+          state.supportedMimeTypes.map((e) => DBusString(e)),
+        )
+      ],
+    );
   }
 
   /// Implementation of org.mpris.MediaPlayer2.Raise()
   Future<DBusMethodResponse> doRaise() async {
-    return DBusMethodErrorResponse.failed(
-        'org.mpris.MediaPlayer2.Raise() not implemented');
+    state.doRaise?.call();
+    return DBusMethodSuccessResponse();
   }
 
   /// Implementation of org.mpris.MediaPlayer2.Quit()
   Future<DBusMethodResponse> doQuit() async {
-    return DBusMethodErrorResponse.failed(
-        'org.mpris.MediaPlayer2.Quit() not implemented');
+    state.doQuit?.call();
+    return DBusMethodSuccessResponse();
   }
 
   @override
