@@ -77,7 +77,13 @@ class Player_Interface extends DBusObject {
         DBusSignature('v'),
         {
           DBusString('mpris:trackid'): DBusVariant(
-            DBusObjectPath(track.hashCode.toString()),
+            DBusObjectPath(
+              '/' +
+                  track.uri
+                      .toString()
+                      .replaceAll(RegExp(r'[^a-zA-Z0-9_/]'), '')
+                      .replaceAll('//', '/'),
+            ),
           ),
           DBusString('mpris:length'): DBusVariant(
             DBusInt64(track.duration?.inMicroseconds ?? 0),
