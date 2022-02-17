@@ -5,4 +5,4 @@
 /// Use of this source code is governed by MIT license that can be found in the LICENSE file.
 library mpris_service;
 
-export 'package:mpris_service/src/mpris_service_base.dart';
+export 'package:mpris_service/src/mpris_service.dart';
