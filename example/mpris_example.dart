@@ -19,8 +19,6 @@ void main() {
       mpris.isPlaying = !mpris.isPlaying;
     },
   );
-  mpris.position = Duration(minutes: 2, seconds: 0);
-  mpris.duration = Duration(minutes: 3, seconds: 16);
   mpris.playlist = [
     MPRISMedia(
       uri: Uri.parse('https://alexmercerind.github.io/music.m4a'),
