@@ -194,11 +194,7 @@ class MPRISServiceState {
           {
             DBusString('mpris:trackid'): DBusVariant(
               DBusObjectPath(
-                '/' +
-                    track.uri
-                        .toString()
-                        .replaceAll(RegExp(r'[^a-zA-Z0-9_/]'), '')
-                        .replaceAll('//', '/'),
+                '/' + track.uri.toString().hashCode.toString(),
               ),
             ),
             DBusString('mpris:length'): DBusVariant(
@@ -272,11 +268,7 @@ class MPRISServiceState {
           {
             DBusString('mpris:trackid'): DBusVariant(
               DBusObjectPath(
-                '/' +
-                    track.uri
-                        .toString()
-                        .replaceAll(RegExp(r'[^a-zA-Z0-9_/]'), '')
-                        .replaceAll('//', '/'),
+                '/' + track.uri.toString().hashCode.toString(),
               ),
             ),
             DBusString('mpris:length'): DBusVariant(
