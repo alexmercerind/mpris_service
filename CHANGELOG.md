@@ -1,3 +1,5 @@
 ## 1.0.0
 
-- Initial version.
+- Feat: `MPRISService` class with `org.mpris.MediaPlayer2` & `org.mpris.MediaPlayer2.Player` interfaces.
+- Feat: `MPRISMedia` model to change `Metadata` in `org.mpris.MediaPlayer2.Player`.
+- Fix: `PropertiesChanged` signal not being emitted.

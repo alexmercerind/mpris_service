@@ -1,14 +1,13 @@
 name: mpris_service
 homepage: https://github.com/alexmercerind/mpris_service.dart
 repository: https://github.com/alexmercerind/mpris_service.dart
-description: A Dart library to integrate Media Player Remote Interfacing Specification (MPRIS). Based on dbus package.
-version: 0.0.1
+description: A Dart library to integrate Media Player Remote Interfacing Specification (MPRIS). Based on dbus.dart package.
+version: 1.0.0
 
 environment:
   sdk: ">=2.16.1 <3.0.0"
 
 dependencies:
-  path: ^1.8.0
   dbus: ^0.7.1
 
 dev_dependencies:
