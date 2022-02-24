@@ -1,6 +1,6 @@
 /// This file is a part of mpris_service.dart (https://github.com/harmonoid/mpris_service.dart).
 ///
-/// Copyright (C) 2020-2022 Hitesh Kumar Saini <saini123hitesh@gmail.com>
+/// Copyright (C) 2022 Hitesh Kumar Saini <saini123hitesh@gmail.com>
 ///
 /// This program is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -23,54 +23,69 @@ import 'package:mpris_service/src/interface.dart';
 
 /// MPRISService
 /// ------------
-///
 /// This class can be used to expose a media player functionalities to The Media Player Remote Interfacing Specification (MPRIS) in standard D-Bus interface.
 ///
+/// _Example_
+/// ```dart
+/// class Harmonoid extends MPRISService {
+///   Harmonoid()
+///       : super(
+///           'harmonoid',
+///           identity: 'Harmonoid',
+///           desktopEntry: '/usr/share/applications/harmonoid.desktop',
+///         );
+///
+///   @override
+///   void doPlayPause() {
+///      isPlaying = !isPlaying;
+///   }
+///
+///   @override
+///   void doNext() {
+///     index++;
+///   }
+///
+///   @override
+///   void doPrevious() {
+///     index--;
+///   }
+/// }
+/// ```
+///
+///
 class MPRISService extends MPRISServiceState {
+  // https://github.com/dart-lang/sdk/issues/41347
+  // https://github.com/dart-lang/sdk/issues/28250#issuecomment-270523406
+
+  void setFullscreen(bool _) {}
+  void doRaise() {}
+  void doQuit() {}
+  void setLoopStatus(String _) {}
+  void setRate(double _) {}
+  void setShuffle(bool _) {}
+  void setVolume(double _) {}
+  void doNext() {}
+  void doPrevious() {}
+  void doPause() {}
+  void doPlayPause() {}
+  void doStop() {}
+  void doPlay() {}
+  void doSeek(int _) {}
+  void doSetPosition(String _, int __) {}
+  void doOpenUri(Uri _) {}
+
   MPRISService(
     String busName, {
     required String identity,
     required String desktopEntry,
     List<String> supportedUriSchemes = kDefaultSupportedUriSchemes,
     List<String> supportedMimeTypes = kDefaultSupportedMimeTypes,
-    void Function(bool)? setFullscreen,
-    void Function()? doRaise,
-    void Function()? doQuit,
-    void Function(String)? setLoopStatus,
-    void Function(double)? setRate,
-    void Function(bool)? setShuffle,
-    void Function(double)? setVolume,
-    void Function()? doNext,
-    void Function()? doPrevious,
-    void Function()? doPause,
-    void Function()? doPlayPause,
-    void Function()? doStop,
-    void Function()? doPlay,
-    void Function(int)? doSeek,
-    void Function(String, int)? doSetPosition,
-    void Function(Uri)? doOpenUri,
   }) : super(
           busName,
           identity,
           desktopEntry,
           supportedUriSchemes,
           supportedMimeTypes,
-          setFullscreen,
-          doRaise,
-          doQuit,
-          setLoopStatus,
-          setRate,
-          setShuffle,
-          setVolume,
-          doNext,
-          doPrevious,
-          doPause,
-          doPlayPause,
-          doStop,
-          doPlay,
-          doSeek,
-          doSetPosition,
-          doOpenUri,
         ) {
     if (Platform.isLinux) {
       interface = Interface(
@@ -88,7 +103,7 @@ class MPRISService extends MPRISServiceState {
 /// MPRISServiceState
 /// -----------------
 ///
-/// An object used to keep the present `org.mpris.MediaPlayer2` _
+/// An object used to keep the present `org.mpris.MediaPlayer2` interface state.
 /// More fields & attributes can be added in future.
 ///
 class MPRISServiceState {
@@ -98,22 +113,6 @@ class MPRISServiceState {
     this.desktopEntry,
     this.supportedUriSchemes,
     this.supportedMimeTypes,
-    this.setFullscreen,
-    this.doRaise,
-    this.doQuit,
-    this.setLoopStatus,
-    this.setRate,
-    this.setShuffle,
-    this.setVolume,
-    this.doNext,
-    this.doPrevious,
-    this.doPause,
-    this.doPlayPause,
-    this.doStop,
-    this.doPlay,
-    this.doSeek,
-    this.doSetPosition,
-    this.doOpenUri,
   );
 
   /// Each media player must request a unique bus name which begins with org.mpris.MediaPlayer2. For example:
@@ -151,23 +150,6 @@ class MPRISServiceState {
 
   /// Whether the media player has a track list.
   bool get hasTrackList => _playlist.isNotEmpty;
-
-  final void Function(bool)? setFullscreen;
-  final void Function()? doRaise;
-  final void Function()? doQuit;
-  final void Function(String)? setLoopStatus;
-  final void Function(double)? setRate;
-  final void Function(bool)? setShuffle;
-  final void Function(double)? setVolume;
-  final void Function()? doNext;
-  final void Function()? doPrevious;
-  final void Function()? doPause;
-  final void Function()? doPlayPause;
-  final void Function()? doStop;
-  final void Function()? doPlay;
-  final void Function(int)? doSeek;
-  final void Function(String, int)? doSetPosition;
-  final void Function(Uri)? doOpenUri;
 
   int get index => _index;
   List<MPRISMedia> get playlist => _playlist;

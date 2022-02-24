@@ -14,58 +14,47 @@
 ///
 /// You should have received a copy of the GNU Affero General Public License
 /// along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 import 'package:dbus/dbus.dart';
 import 'package:mpris_service/src/mpris_service.dart';
 
 class Interface extends DBusObject {
-  final MPRISServiceState state;
+  final MPRISService state;
 
-  /// Creates a new object to expose on [path].
   Interface(this.state, DBusObjectPath path) : super(path);
 
-  /// Gets value of property org.mpris.MediaPlayer2.CanQuit
   Future<DBusMethodResponse> getCanQuit() async {
     return DBusMethodSuccessResponse([DBusBoolean(state.canQuit)]);
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.Fullscreen
   Future<DBusMethodResponse> getFullscreen() async {
     return DBusMethodSuccessResponse([DBusBoolean(state.fullscreen)]);
   }
 
-  /// Sets property org.mpris.MediaPlayer2.Fullscreen
   Future<DBusMethodResponse> setFullscreen(bool value) async {
-    state.setFullscreen?.call(value);
+    state.setFullscreen.call(value);
     return DBusMethodSuccessResponse();
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.CanSetFullscreen
   Future<DBusMethodResponse> getCanSetFullscreen() async {
     return DBusMethodSuccessResponse([DBusBoolean(state.canSetFullscreen)]);
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.CanRaise
   Future<DBusMethodResponse> getCanRaise() async {
     return DBusMethodSuccessResponse([DBusBoolean(state.canRaise)]);
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.HasTrackList
   Future<DBusMethodResponse> getHasTrackList() async {
     return DBusMethodSuccessResponse([DBusBoolean(state.hasTrackList)]);
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.Identity
   Future<DBusMethodResponse> getIdentity() async {
     return DBusMethodSuccessResponse([DBusString(state.identity)]);
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.DesktopEntry
   Future<DBusMethodResponse> getDesktopEntry() async {
     return DBusMethodSuccessResponse([DBusString(state.desktopEntry)]);
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.SupportedUriSchemes
   Future<DBusMethodResponse> getSupportedUriSchemes() async {
     return DBusMethodSuccessResponse(
       [
@@ -77,7 +66,6 @@ class Interface extends DBusObject {
     );
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.SupportedMimeTypes
   Future<DBusMethodResponse> getSupportedMimeTypes() async {
     return DBusMethodSuccessResponse(
       [
@@ -89,15 +77,13 @@ class Interface extends DBusObject {
     );
   }
 
-  /// Implementation of org.mpris.MediaPlayer2.Raise()
   Future<DBusMethodResponse> doRaise() async {
-    state.doRaise?.call();
+    state.doRaise.call();
     return DBusMethodSuccessResponse();
   }
 
-  /// Implementation of org.mpris.MediaPlayer2.Quit()
   Future<DBusMethodResponse> doQuit() async {
-    state.doQuit?.call();
+    state.doQuit.call();
     return DBusMethodSuccessResponse();
   }
 
@@ -113,42 +99,34 @@ class Interface extends DBusObject {
     ]);
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.Player.LoopStatus
   Future<DBusMethodResponse> getLoopStatus() async {
     return DBusMethodSuccessResponse([DBusString(state.loopStatus)]);
   }
 
-  /// Sets property org.mpris.MediaPlayer2.Player.LoopStatus
   Future<DBusMethodResponse> setLoopStatus(String value) async {
-    state.setLoopStatus?.call(value);
+    state.setLoopStatus.call(value);
     return DBusMethodSuccessResponse();
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.Player.Rate
   Future<DBusMethodResponse> getRate() async {
     return DBusMethodSuccessResponse([DBusDouble(state.rate)]);
   }
 
-  /// Sets property org.mpris.MediaPlayer2.Player.Rate
   Future<DBusMethodResponse> setRate(double value) async {
-    state.setRate?.call(value);
+    state.setRate.call(value);
     return DBusMethodSuccessResponse();
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.Player.Shuffle
   Future<DBusMethodResponse> getShuffle() async {
     return DBusMethodSuccessResponse([DBusBoolean(state.isShuffling)]);
   }
 
-  /// Sets property org.mpris.MediaPlayer2.Player.Shuffle
   Future<DBusMethodResponse> setShuffle(bool value) async {
-    state.setShuffle?.call(value);
+    state.setShuffle.call(value);
     return DBusMethodSuccessResponse();
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.Player.Metadata
   Future<DBusMethodResponse> getMetadata() async {
-    /// https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata
     if (state.playlist.isEmpty) {
       return DBusMethodSuccessResponse(
         [DBusDict(DBusSignature('s'), DBusSignature('v'), {})],
@@ -210,132 +188,111 @@ class Interface extends DBusObject {
     ]);
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.Player.Volume
   Future<DBusMethodResponse> getVolume() async {
     return DBusMethodSuccessResponse([DBusDouble(state.volume / 100)]);
   }
 
-  /// Sets property org.mpris.MediaPlayer2.Player.Volume
   Future<DBusMethodResponse> setVolume(double value) async {
-    state.setVolume?.call(value * 100);
+    state.setVolume.call(value * 100);
     return DBusMethodSuccessResponse();
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.Player.Position
   Future<DBusMethodResponse> getPosition() async {
     return DBusMethodSuccessResponse(
       [DBusInt64(state.position.inMicroseconds)],
     );
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.Player.MinimumRate
   Future<DBusMethodResponse> getMinimumRate() async {
     return DBusMethodSuccessResponse([DBusDouble(0.5)]);
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.Player.MaximumRate
   Future<DBusMethodResponse> getMaximumRate() async {
     return DBusMethodSuccessResponse([DBusDouble(2.0)]);
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.Player.CanGoNext
   Future<DBusMethodResponse> getCanGoNext() async {
     return DBusMethodSuccessResponse(
       [DBusBoolean(state.index < state.playlist.length - 1)],
     );
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.Player.CanGoPrevious
   Future<DBusMethodResponse> getCanGoPrevious() async {
     return DBusMethodSuccessResponse(
       [DBusBoolean(state.index > 0)],
     );
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.Player.CanPlay
   Future<DBusMethodResponse> getCanPlay() async {
     return DBusMethodSuccessResponse(
       [DBusBoolean(true)],
     );
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.Player.CanPause
   Future<DBusMethodResponse> getCanPause() async {
     return DBusMethodSuccessResponse(
       [DBusBoolean(true)],
     );
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.Player.CanSeek
   Future<DBusMethodResponse> getCanSeek() async {
     return DBusMethodSuccessResponse(
       [DBusBoolean(true)],
     );
   }
 
-  /// Gets value of property org.mpris.MediaPlayer2.Player.CanControl
   Future<DBusMethodResponse> getCanControl() async {
     return DBusMethodSuccessResponse(
       [DBusBoolean(true)],
     );
   }
 
-  /// Implementation of org.mpris.MediaPlayer2.Player.Next()
   Future<DBusMethodResponse> doNext() async {
-    state.doNext?.call();
+    state.doNext.call();
     return DBusMethodSuccessResponse();
   }
 
-  /// Implementation of org.mpris.MediaPlayer2.Player.Previous()
   Future<DBusMethodResponse> doPrevious() async {
-    state.doPrevious?.call();
+    state.doPrevious.call();
     return DBusMethodSuccessResponse();
   }
 
-  /// Implementation of org.mpris.MediaPlayer2.Player.Pause()
   Future<DBusMethodResponse> doPause() async {
-    state.doPause?.call();
+    state.doPause.call();
     return DBusMethodSuccessResponse();
   }
 
-  /// Implementation of org.mpris.MediaPlayer2.Player.PlayPause()
   Future<DBusMethodResponse> doPlayPause() async {
-    state.doPlayPause?.call();
+    state.doPlayPause.call();
     return DBusMethodSuccessResponse();
   }
 
-  /// Implementation of org.mpris.MediaPlayer2.Player.Stop()
   Future<DBusMethodResponse> doStop() async {
-    state.doStop?.call();
+    state.doStop.call();
     return DBusMethodSuccessResponse();
   }
 
-  /// Implementation of org.mpris.MediaPlayer2.Player.Play()
   Future<DBusMethodResponse> doPlay() async {
-    state.doPlay?.call();
+    state.doPlay.call();
     return DBusMethodSuccessResponse();
   }
 
-  /// Implementation of org.mpris.MediaPlayer2.Player.Seek()
   Future<DBusMethodResponse> doSeek(int value) async {
-    state.doSeek?.call(value);
+    state.doSeek.call(value);
     return DBusMethodSuccessResponse();
   }
 
-  /// Implementation of org.mpris.MediaPlayer2.Player.SetPosition()
   Future<DBusMethodResponse> doSetPosition(
       String trackObjectPath, int position) async {
-    state.doSetPosition?.call(trackObjectPath, position);
+    state.doSetPosition.call(trackObjectPath, position);
     return DBusMethodSuccessResponse();
   }
 
-  /// Implementation of org.mpris.MediaPlayer2.Player.OpenUri()
   Future<DBusMethodResponse> doOpenUri(String uri) async {
-    state.doOpenUri?.call(Uri.parse(uri));
+    state.doOpenUri.call(Uri.parse(uri));
     return DBusMethodSuccessResponse();
   }
 
-  /// Emits signal org.mpris.MediaPlayer2.Player.Seeked
   Future<void> emitSeeked(int position) async {
     await emitSignal(
         'org.mpris.MediaPlayer2.Player', 'Seeked', [DBusInt64(position)]);
