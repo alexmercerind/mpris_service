@@ -1,6 +1,6 @@
 /// This file is a part of mpris_service.dart (https://github.com/harmonoid/mpris_service.dart).
 ///
-/// Copyright (C) 2020-2022 Hitesh Kumar Saini <saini123hitesh@gmail.com>
+/// Copyright (C) 2022 Hitesh Kumar Saini <saini123hitesh@gmail.com>
 ///
 /// This program is free software: you can redistribute it and/or modify
 /// it under the terms of the GNU Affero General Public License as
@@ -17,26 +17,38 @@
 
 import 'package:mpris_service/mpris_service.dart';
 
+class Harmonoid extends MPRISService {
+  Harmonoid()
+      : super(
+          'harmonoid',
+          identity: 'Harmonoid',
+          desktopEntry: '/usr/share/applications/harmonoid.desktop',
+        );
+
+  @override
+  void doPlayPause() {
+    print('[Harmonoid] doPlayPause');
+    isPlaying = !isPlaying;
+  }
+
+  @override
+  void doNext() {
+    print('[Harmonoid] doNext');
+    index++;
+  }
+
+  @override
+  void doPrevious() {
+    print('[Harmonoid] doPrevious');
+    index--;
+  }
+}
+
 void main() {
-  MPRISService mpris = MPRISService(
-    'harmonoid',
-    identity: 'Harmonoid',
-    desktopEntry: '/usr/share/applications/harmonoid.desktop',
-    doPlay: () {
-      print('Play.');
-      mpris.isPlaying = true;
-    },
-    doPause: () {
-      print('Pause.');
-      mpris.isPlaying = false;
-    },
-    doPlayPause: () {
-      print('Play/Pause.');
-      mpris.isPlaying = !mpris.isPlaying;
-    },
-  );
-  mpris.playlist = [
-    MPRISMedia(
+  final application = Harmonoid();
+  application.playlist = List.generate(
+    100,
+    (index) => MPRISMedia(
       uri: Uri.parse('https://alexmercerind.github.io/music.m4a'),
       trackName: 'Make Me Move (feat. KARRA)',
       albumName: 'Make Me Move',
@@ -48,7 +60,7 @@ void main() {
       duration: Duration(minutes: 3, seconds: 16),
       bitrate: 156,
       artworkUri:
-          'https://ncsmusic.s3.eu-west-1.amazonaws.com/tracks/000/000/286/1000x0/make-me-move-feat-karra-1586948717-dTsA9So1cu.jpg',
+          'https://lh3.googleusercontent.com/khT39Qh0-PYr4t9h3lWStqLfzab5NBeTeKiva_sC2s6LMvsaGHTVWvZlMlEEV9BrUSP4mpEbjPMBexdguw=w544-h544-l90-rj',
     ),
-  ];
+  );
 }
