@@ -1,6 +1,7 @@
 # [package:mpris_service](https://github.com/alexmercerind/mpris_service)
 
 A package to integrate [Media Player Remote Interfacing Specification (MPRIS)](https://specifications.freedesktop.org/mpris-spec/latest/) in Dart.
+<br></br>
 
 ![Screenshot from 2022-12-26 07 23 01](https://user-images.githubusercontent.com/28951144/209481093-a067d628-0911-484c-9684-0924e834613a.jpeg)
 
@@ -46,7 +47,8 @@ instance.metadata = MPRISMetadata(
   Uri.parse('https://music.youtube.com/watch?v=Gr6g3-6VQoE'),
   length: Duration(minutes: 3, seconds: 15),
   artUrl: Uri.parse(
-      'https://lh3.googleusercontent.com/jvgMIjgbvnqnwLwjtqNa0euo9WStdIxrJnpQURgbwuPazT2OpZUdYPZe1gss2fK39oC8ITofFmeGxKY'),
+    'https://lh3.googleusercontent.com/jvgMIjgbvnqnwLwjtqNa0euo9WStdIxrJnpQURgbwuPazT2OpZUdYPZe1gss2fK39oC8ITofFmeGxKY',
+  ),
   album: 'Collage',
   albumArtist: ['The Chainsmokers'],
   artist: ['The Chainsmokers', 'Phoebe Ryan'],
