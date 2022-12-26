@@ -6,6 +6,7 @@
 
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:convert';
 import 'package:dbus/dbus.dart';
 
 /// {@template mpris}
@@ -41,34 +42,38 @@ class MPRIS {
   /// The DBus client.
   final DBusClient _client;
 
+  MPRIS._(this._mediaPlayer2, this._client);
+
   /// {@macro mpris}
-  MPRIS({
+  static Future<MPRIS> create({
     required String busName,
     required String identity,
     required String desktopEntry,
-    required MPRISEventListeners eventListeners,
     Set<String> supportedUriSchemes = kDefaultSupportedUriSchemes,
     Set<String> supportedMimeTypes = kDefaultSupportedMimeTypes,
-  }): _mediaPlayer2 = MediaPlayer2(
-        DBusObjectPath('/org/mpris/MediaPlayer2'),
-        eventListeners,
-        identity,
-        desktopEntry,
-        supportedUriSchemes,
-        supportedMimeTypes,
-      ),
-      _client = DBusClient.session()
-  {
-    () async {
-      await _client.registerObject(_mediaPlayer2);
-      await _client.requestName(busName);
-    }();
+  }) async {
+    final mediaPlayer2 = MediaPlayer2(
+      DBusObjectPath('/org/mpris/MediaPlayer2'),
+      identity,
+      desktopEntry,
+      supportedUriSchemes,
+      supportedMimeTypes,
+    );
+    final client = DBusClient.session();
+    await client.requestName(busName);
+    await client.registerObject(mediaPlayer2);
+    return MPRIS._(mediaPlayer2, client);
   }
 
   /// Disposes the [MPRIS] instance & closes the DBus client.
   /// Allocated resources are released back to the system.
   Future<void> dispose() {
     return _client.close();
+  }
+
+  /// Sets event handler.
+  void setEventHandler(MPRISEventHandler handler) {
+    _mediaPlayer2.handler = handler;
   }
 
   // Getters.
@@ -366,15 +371,15 @@ enum MPRISPlaybackStatus { playing, paused, stopped }
 /// Loop status of the media player.
 enum MPRISLoopStatus { none, track, playlist }
 
-/// {@template mpris_event_listeners}
+/// {@template mpris_event_handler}
 /// 
-/// MPRISEventListeners
-/// -------------------
+/// MPRISEventHandler
+/// -----------------
 /// 
-/// This class is used to listen & react to MPRIS events.
+/// This class is used for listening to MPRIS events.
 /// 
 /// {@endtemplate}
-class MPRISEventListeners {
+class MPRISEventHandler {
   // org.mpris.MediaPlayer2
 
   // Methods
@@ -407,8 +412,8 @@ class MPRISEventListeners {
   Future<void> Function(bool value)? shuffle;
   Future<void> Function(double value)? volume;
 
-  /// {@macro mpris_event_listeners}
-  MPRISEventListeners({
+  /// {@macro mpris_event_handler}
+  MPRISEventHandler({
     this.raise,
     this.quit,
     this.fullscreen,
@@ -500,7 +505,7 @@ class MPRISMetadata {
       {
         // Assigning `mpris:trackid` based on the URL itself.
         // This will avoid any misunderstanding to the developers using this library.
-        DBusString('mpris:trackid'): DBusVariant(DBusObjectPath('/${uri.toString()}')),
+        DBusString('mpris:trackid'): DBusVariant(DBusObjectPath('/${base64.encode(utf8.encode(uri.toString()))}')),
         if (length != null) DBusString('mpris:length'): DBusVariant(DBusInt64(length!.inMicroseconds)),
         if (artUrl != null) DBusString('mpris:artUrl'): DBusVariant(DBusString(artUrl!.toString())),
         if (album != null) DBusString('xesam:album'): DBusVariant(DBusString(album!)),
@@ -591,13 +596,18 @@ class MPRISMetadata {
 /// 
 /// {@endtemplate}
 class MediaPlayer2 extends DBusObject {
-  bool CanQuit = false;
-  bool Fullscreen = false;
-  bool CanSetFullscreen = false;
-  bool CanRaise = false;
-  bool HasTrackList = false;
 
-  MPRISPlaybackStatus PlaybackStatus = MPRISPlaybackStatus.stopped;
+  // org.mpris.MediaPlayer2
+
+  bool CanQuit = true;
+  bool Fullscreen = false;
+  bool CanSetFullscreen = true;
+  bool CanRaise = true;
+  bool HasTrackList = true;
+
+  // org.mpris.MediaPlayer2.Player
+
+  MPRISPlaybackStatus PlaybackStatus = MPRISPlaybackStatus.paused;
   MPRISLoopStatus LoopStatus = MPRISLoopStatus.none;
   double Rate = 1.0;
   bool Shuffle = false;
@@ -606,23 +616,23 @@ class MediaPlayer2 extends DBusObject {
   Duration Position = Duration.zero;
   double MinimumRate = 1.0;
   double MaximumRate = 1.0;
-  bool CanGoNext = false;
-  bool CanGoPrevious = false;
-  bool CanPlay = false;
-  bool CanPause = false;
-  bool CanSeek = false;
-  bool CanControl = false;
+  bool CanGoNext = true;
+  bool CanGoPrevious = true;
+  bool CanPlay = true;
+  bool CanPause = true;
+  bool CanSeek = true;
+  bool CanControl = true;
 
-  final MPRISEventListeners EventListeners;
   final String Identity;
   final String DesktopEntry;
   final Set<String> SupportedUriSchemes;
   final Set<String> SupportedMimeTypes;
 
+  MPRISEventHandler? handler;
+
   /// {@macro media_player_2}
   MediaPlayer2(
     DBusObjectPath path,
-    this.EventListeners,
     this.Identity,
     this.DesktopEntry,
     this.SupportedUriSchemes,
@@ -638,7 +648,7 @@ class MediaPlayer2 extends DBusObject {
   }
 
   Future<DBusMethodResponse> setFullscreen(bool Value) async {
-    await EventListeners.fullscreen?.call(Value);
+    await handler?.fullscreen?.call(Value);
     return DBusMethodSuccessResponse([]);
   }
 
@@ -671,12 +681,12 @@ class MediaPlayer2 extends DBusObject {
   }
 
   Future<DBusMethodResponse> doRaise() async {
-    await EventListeners.raise?.call();
+    await handler?.raise?.call();
     return DBusMethodSuccessResponse([]);
   }
 
   Future<DBusMethodResponse> doQuit() async {
-    await EventListeners.quit?.call();
+    await handler?.quit?.call();
     return DBusMethodSuccessResponse([]);
   }
 
@@ -689,7 +699,7 @@ class MediaPlayer2 extends DBusObject {
   }
 
   Future<DBusMethodResponse> setLoopStatus(String Value) async {
-    await EventListeners.loopStatus?.call({
+    await handler?.loopStatus?.call({
       'None': MPRISLoopStatus.none,
       'Track': MPRISLoopStatus.track,
       'Playlist': MPRISLoopStatus.playlist,
@@ -702,7 +712,7 @@ class MediaPlayer2 extends DBusObject {
   }
 
   Future<DBusMethodResponse> setRate(double Value) async {
-    await EventListeners.rate?.call(Value);
+    await handler?.rate?.call(Value);
     return DBusMethodSuccessResponse([]);
   }
 
@@ -711,7 +721,7 @@ class MediaPlayer2 extends DBusObject {
   }
 
   Future<DBusMethodResponse> setShuffle(bool Value) async {
-    await EventListeners.shuffle?.call(Value);
+    await handler?.shuffle?.call(Value);
     return DBusMethodSuccessResponse([]);
   }
 
@@ -724,7 +734,7 @@ class MediaPlayer2 extends DBusObject {
   }
 
   Future<DBusMethodResponse> setVolume(double Value) async {
-    await EventListeners.volume?.call(Value);
+    await handler?.volume?.call(Value);
     return DBusMethodSuccessResponse([]);
   }
 
@@ -765,47 +775,47 @@ class MediaPlayer2 extends DBusObject {
   }
 
   Future<DBusMethodResponse> doNext() async {
-    await EventListeners.next?.call();
+    await handler?.next?.call();
     return DBusMethodSuccessResponse([]);
   }
 
   Future<DBusMethodResponse> doPrevious() async {
-    await EventListeners.previous?.call();
+    await handler?.previous?.call();
     return DBusMethodSuccessResponse([]);
   }
 
   Future<DBusMethodResponse> doPause() async {
-    await EventListeners.pause?.call();
+    await handler?.pause?.call();
     return DBusMethodSuccessResponse([]);
   }
 
   Future<DBusMethodResponse> doPlayPause() async {
-    await EventListeners.playPause?.call();
+    await handler?.playPause?.call();
     return DBusMethodSuccessResponse([]);
   }
 
   Future<DBusMethodResponse> doStop() async {
-    await EventListeners.stop?.call();
+    await handler?.stop?.call();
     return DBusMethodSuccessResponse([]);
   }
 
   Future<DBusMethodResponse> doPlay() async {
-    await EventListeners.play?.call();
+    await handler?.play?.call();
     return DBusMethodSuccessResponse([]);
   }
 
   Future<DBusMethodResponse> doSeek(int Offset) async {
-    await EventListeners.seek?.call(Duration(microseconds: Offset));
+    await handler?.seek?.call(Duration(microseconds: Offset));
     return DBusMethodSuccessResponse([]);
   }
 
   Future<DBusMethodResponse> doSetPosition(String TrackId, int Position) async {
-    await EventListeners.setPosition?.call(Uri.parse(TrackId.substring(1)), Position);
+    await handler?.setPosition?.call(Uri.parse(utf8.decode(base64.decode(TrackId.substring(1)))), Position);
     return DBusMethodSuccessResponse([]);
   }
 
   Future<DBusMethodResponse> doOpenUri(String Uri_) async {
-    await EventListeners.openUri?.call(Uri.parse(Uri_));
+    await handler?.openUri?.call(Uri.parse(Uri_));
     return DBusMethodErrorResponse.failed();
   }
 
