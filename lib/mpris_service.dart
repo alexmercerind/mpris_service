@@ -7,7 +7,10 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:dbus/dbus.dart';
+import 'package:base_x/base_x.dart';
+import 'package:collection/collection.dart';
 
 /// {@template mpris}
 ///
@@ -102,101 +105,121 @@ class MPRIS {
   // Setters.
 
   set canQuit(bool value) {
+    if (value == _mediaPlayer2.CanQuit) return;
     _mediaPlayer2.CanQuit = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2', changedProperties: {'CanQuit': DBusBoolean(value)});
   }
 
   set fullscreen(bool value) {
+    if (value == _mediaPlayer2.Fullscreen) return;
     _mediaPlayer2.Fullscreen = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2', changedProperties: {'Fullscreen': DBusBoolean(value)});
   }
 
   set canSetFullscreen(bool value) {
+    if (value == _mediaPlayer2.CanSetFullscreen) return;
     _mediaPlayer2.CanSetFullscreen = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2', changedProperties: {'CanSetFullscreen': DBusBoolean(value)});
   }
 
   set canRaise(bool value) {
+    if (value == _mediaPlayer2.CanRaise) return;
     _mediaPlayer2.CanRaise = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2', changedProperties: {'CanRaise': DBusBoolean(value)});
   }
 
   set hasTrackList(bool value) {
+    if (value == _mediaPlayer2.HasTrackList) return;
     _mediaPlayer2.HasTrackList = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2', changedProperties: {'HasTrackList': DBusBoolean(value)});
   }
 
   set playbackStatus(MPRISPlaybackStatus value) {
+    if (value == _mediaPlayer2.PlaybackStatus) return;
     _mediaPlayer2.PlaybackStatus = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2.Player', changedProperties: {'PlaybackStatus': DBusString(value.name[0].toUpperCase() + value.name.substring(1))});
   }
 
   set loopStatus(MPRISLoopStatus value) {
+    if (value == _mediaPlayer2.LoopStatus) return;
     _mediaPlayer2.LoopStatus = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2.Player', changedProperties: {'LoopStatus': DBusString(value.name[0].toUpperCase() + value.name.substring(1))});
   }
 
   set rate(double value) {
+    if (value == _mediaPlayer2.Rate) return;
     _mediaPlayer2.Rate = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2.Player', changedProperties: {'Rate': DBusDouble(value)});
   }
   
   set shuffle(bool value) {
+    if (value == _mediaPlayer2.Shuffle) return;
     _mediaPlayer2.Shuffle = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2.Player', changedProperties: {'Shuffle': DBusBoolean(value)});
   }
 
   set metadata(MPRISMetadata value) {
+    if (value == _mediaPlayer2.Metadata) return;
     _mediaPlayer2.Metadata = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2.Player', changedProperties: {'Metadata': value.toDBusDict()});
   }
 
   set volume(double value) {
+    if (value == _mediaPlayer2.Volume) return;
     _mediaPlayer2.Volume = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2.Player', changedProperties: {'Volume': DBusDouble(value)});
   }
 
   set position(Duration value) {
+    if (value == _mediaPlayer2.Position) return;
     _mediaPlayer2.Position = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2.Player', changedProperties: {'Position': DBusInt64(value.inMicroseconds)});
   }
 
   set minimumRate(double value) {
+    if (value == _mediaPlayer2.MinimumRate) return;
     _mediaPlayer2.MinimumRate = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2.Player', changedProperties: {'MinimumRate': DBusDouble(value)});
   }
 
   set maximumRate(double value) {
+    if (value == _mediaPlayer2.MaximumRate) return;
     _mediaPlayer2.MaximumRate = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2.Player', changedProperties: {'MaximumRate': DBusDouble(value)});
   }
 
   set canGoNext(bool value) {
+    if (value == _mediaPlayer2.CanGoNext) return;
     _mediaPlayer2.CanGoNext = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2.Player', changedProperties: {'CanGoNext': DBusBoolean(value)});
   }
 
   set canGoPrevious(bool value) {
+    if (value == _mediaPlayer2.CanGoPrevious) return;
     _mediaPlayer2.CanGoPrevious = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2.Player', changedProperties: {'CanGoPrevious': DBusBoolean(value)});
   }
 
   set canPlay(bool value) {
+    if (value == _mediaPlayer2.CanPlay) return;
     _mediaPlayer2.CanPlay = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2.Player', changedProperties: {'CanPlay': DBusBoolean(value)});
   }
 
   set canPause(bool value) {
+    if (value == _mediaPlayer2.CanPause) return;
     _mediaPlayer2.CanPause = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2.Player', changedProperties: {'CanPause': DBusBoolean(value)});
   }
 
   set canSeek(bool value) {
+    if (value == _mediaPlayer2.CanSeek) return;
     _mediaPlayer2.CanSeek = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2.Player', changedProperties: {'CanSeek': DBusBoolean(value)});
   }
   
   set canControl(bool value) {
+    if (value == _mediaPlayer2.CanControl) return;
     _mediaPlayer2.CanControl = value;
     _mediaPlayer2.emitPropertiesChanged('org.mpris.MediaPlayer2.Player', changedProperties: {'CanControl': DBusBoolean(value)});
   }
@@ -498,6 +521,7 @@ class MPRISMetadata {
   });
 
   DBusDict toDBusDict() {
+    final base62 = BaseXCodec(kBase62Chars);
     // According to https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata.
     return DBusDict(
       DBusSignature('s'),
@@ -505,7 +529,7 @@ class MPRISMetadata {
       {
         // Assigning `mpris:trackid` based on the URL itself.
         // This will avoid any misunderstanding to the developers using this library.
-        DBusString('mpris:trackid'): DBusVariant(DBusObjectPath('/${base64.encode(utf8.encode(uri.toString()))}')),
+        DBusString('mpris:trackid'): DBusVariant(DBusObjectPath('$kMPRISMetadataObjectPathPrefix${base62.encode(Uint8List.fromList(utf8.encode(uri.toString()))).replaceAll('=', '_')}')),
         if (length != null) DBusString('mpris:length'): DBusVariant(DBusInt64(length!.inMicroseconds)),
         if (artUrl != null) DBusString('mpris:artUrl'): DBusVariant(DBusString(artUrl!.toString())),
         if (album != null) DBusString('xesam:album'): DBusVariant(DBusString(album!)),
@@ -578,6 +602,56 @@ class MPRISMetadata {
       userRating: userRating ?? this.userRating,
     );
   }
+
+  @override
+  operator ==(Object other) {
+    if (other is! MPRISMetadata) return false;
+    final eq = ListEquality();
+    return uri == other.uri &&
+      length == other.length &&
+      artUrl == other.artUrl &&
+      album == other.album &&
+      eq.equals(albumArtist, other.albumArtist) &&
+      eq.equals(artist, other.artist) &&
+      lyrics == other.lyrics &&
+      audioBPM == other.audioBPM &&
+      autoRating == other.autoRating &&
+      eq.equals(comment, other.comment) &&
+      eq.equals(composer, other.composer) &&
+      contentCreated == other.contentCreated &&
+      discNumber == other.discNumber &&
+      firstUsed == other.firstUsed &&
+      eq.equals(genre, other.genre) &&
+      lastUsed == other.lastUsed &&
+      eq.equals(lyricist, other.lyricist) &&
+      title == other.title &&
+      trackNumber == other.trackNumber &&
+      useCount == other.useCount &&
+      userRating == other.userRating;
+  }
+  
+  @override
+  int get hashCode => uri.hashCode ^
+    length.hashCode ^
+    artUrl.hashCode ^
+    album.hashCode ^
+    albumArtist.hashCode ^
+    artist.hashCode ^
+    lyrics.hashCode ^
+    audioBPM.hashCode ^
+    autoRating.hashCode ^
+    comment.hashCode ^
+    composer.hashCode ^
+    contentCreated.hashCode ^
+    discNumber.hashCode ^
+    firstUsed.hashCode ^
+    genre.hashCode ^
+    lastUsed.hashCode ^
+    lyricist.hashCode ^
+    title.hashCode ^
+    trackNumber.hashCode ^
+    useCount.hashCode ^
+    userRating.hashCode;
 }
 
 
@@ -603,7 +677,7 @@ class MediaPlayer2 extends DBusObject {
   bool Fullscreen = false;
   bool CanSetFullscreen = true;
   bool CanRaise = true;
-  bool HasTrackList = true;
+  bool HasTrackList = false;
 
   // org.mpris.MediaPlayer2.Player
 
@@ -611,7 +685,7 @@ class MediaPlayer2 extends DBusObject {
   MPRISLoopStatus LoopStatus = MPRISLoopStatus.none;
   double Rate = 1.0;
   bool Shuffle = false;
-  MPRISMetadata Metadata = MPRISMetadata(Uri.parse(''));
+  MPRISMetadata Metadata = MPRISMetadata(Uri.parse('default'));
   double Volume = 1.0;
   Duration Position = Duration.zero;
   double MinimumRate = 1.0;
@@ -810,7 +884,8 @@ class MediaPlayer2 extends DBusObject {
   }
 
   Future<DBusMethodResponse> doSetPosition(String TrackId, int Position) async {
-    await handler?.setPosition?.call(Uri.parse(utf8.decode(base64.decode(TrackId.substring(1)))), Position);
+    final base62 = BaseXCodec(kBase62Chars);
+    await handler?.setPosition?.call(Uri.parse(utf8.decode(base62.decode(TrackId.substring(kMPRISMetadataObjectPathPrefix.length).replaceAll('_', '=')))), Position);
     return DBusMethodSuccessResponse([]);
   }
 
@@ -1127,3 +1202,18 @@ class MediaPlayer2 extends DBusObject {
     return DBusMethodSuccessResponse([DBusDict.stringVariant(properties)]);
   }
 }
+
+/// Used for encoding URI into a D-Bus object path.
+/// Base 62 encoding is used to avoid any invalid characters in the object path.
+///
+/// See: https://en.wikipedia.org/wiki/Base62
+///
+/// An object path may contain [A-Z][a-z][0-9]_ separated by one or more `/` dividers.
+/// This can be easily encoded using base 62.
+///
+/// However, base 62 encoding may occasionally produce a `=` character for padding, which is illegal in an object path. Thus, replacing `=` with `_`.
+const kBase62Chars =
+    '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+/// Prefix used for [MPRISMetadata] object paths.
+const kMPRISMetadataObjectPathPrefix = '/com/alexmercerind/mpris_service/MPRISMetadata/';
