@@ -60,6 +60,6 @@ instance.metadata = MPRISMetadata(
 
 ## License
 
-Copyright © 2022, Hitesh Kumar Saini <<saini123hitesh@gmail.com>>
+Copyright © 2021 & onwards, Hitesh Kumar Saini <<saini123hitesh@gmail.com>>
 
 This project & the work under this repository is governed by MIT license that can be found in the [LICENSE](./LICENSE) file.
